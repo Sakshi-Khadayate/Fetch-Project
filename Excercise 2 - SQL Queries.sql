@@ -29,7 +29,9 @@ CREATE TABLE Transactions (
     user_id VARCHAR(255) NULL,
     barcode BIGINT NULL,
     quantity NUMERIC NULL,
-    sale NUMERIC NULL
+    sale NUMERIC NULL,
+    FOREIGN KEY (user_id) REFERENCES Users(id),
+    FOREIGN KEY (barcode) REFERENCES Products(barcode)
 );
 
 -- ** Top 5 brands by receipts scanned among users 21 and over **

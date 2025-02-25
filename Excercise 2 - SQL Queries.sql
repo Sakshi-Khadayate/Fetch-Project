@@ -37,10 +37,9 @@ CREATE TABLE Transactions (
 -- ** Top 5 brands by receipts scanned among users 21 and over **
 WITH user_age AS (
     -- Calculates user age and filters out users under 21 (kept 21 and older)
-    SELECT 
-        ID
+    SELECT ID
     FROM Users
-	WHERE  TIMESTAMPDIFF(YEAR, STR_TO_DATE(BIRTH_DATE, '%Y-%m-%d'), CURDATE()) >= 21
+    WHERE  TIMESTAMPDIFF(YEAR, STR_TO_DATE(BIRTH_DATE, '%Y-%m-%d'), CURDATE()) >= 21
     AND YEAR(BIRTH_DATE) != 1900 -- Filters out 1900, as blank dates were set to '1900-01-01' for consistency 
 ) 
 SELECT 
@@ -59,8 +58,7 @@ ORDER BY receipt_count DESC, p.BRAND;
 -- ** Top 5 brands by sales among users that have had their account for at least 6 months **
 WITH experienced_users AS (
 	-- Filters users who have had an account for at least six months 
-    SELECT 
-        ID
+    SELECT ID
     FROM Users
     WHERE TIMESTAMPDIFF(MONTH, STR_TO_DATE(CREATED_DATE, '%Y-%m-%d'), CURDATE())  >= 6 
 )
@@ -123,8 +121,8 @@ WITH user_metrics AS (
         u.ID,
         COUNT(DISTINCT t.RECEIPT_ID) as receipt_count, -- Total distinct receipts per user
         SUM(t.SALE) as total_spend,  -- Total spend by user
-		ROUND(AVG(DATEDIFF(STR_TO_DATE(t.SCAN_DATE, '%Y-%m-%d'),
-			         STR_TO_DATE(t.PURCHASE_DATE, '%Y-%m-%d'))), 2) as avg_scan_time, -- Average time between scan and purchase
+	ROUND(AVG(DATEDIFF(STR_TO_DATE(t.SCAN_DATE, '%Y-%m-%d'),
+        STR_TO_DATE(t.PURCHASE_DATE, '%Y-%m-%d'))), 2) as avg_scan_time, -- Average time between scan and purchase
         MAX(STR_TO_DATE(t.SCAN_DATE, '%Y-%m-%d')) as last_activity  -- Most recent scan date
     FROM Users u
     JOIN Transactions t ON u.ID = t.USER_ID
@@ -143,12 +141,12 @@ SELECT
     u.LANGUAGE,
     U.GENDER,
     um.total_spend,
-	um.receipt_count,
+    um.receipt_count,
     um.avg_scan_time,
     DATEDIFF(CURDATE(), um.last_activity) as days_since_last_active
 FROM user_metrics um
 JOIN Users u ON um.ID = u.ID
--- Filter to only include users in the 9th sp end decile (top 20% by total spend)
+-- Filter to only include users in the 9th spend decile (top 20% by total spend)
 AND um.total_spend >= (
  SELECT MIN(total_spend)
    FROM spend_percentile 
